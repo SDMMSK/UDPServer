@@ -1,0 +1,153 @@
+/* g++ -o udpserver udpserver.cpp -std=c++11 json11.cpp -pthread -s -O2 */
+/* udpserver 127.0.0.1 10003 */
+
+#include <iostream>
+#include <sstream>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <iterator>
+#include <unistd.h>
+#include <stack>
+#include <vector>
+#include <signal.h>
+
+#include <thread>
+
+#include "json11.hpp"
+
+using namespace std;
+using namespace json11;
+
+int sockfd;
+
+int StopFlag = 1;
+
+void error(char *msg) {
+    perror(msg);
+    exit(EXIT_FAILURE);
+}
+
+void termHandler(int i);
+void threadProc(int tnum);
+
+void printLog(string severity, string msg) {
+    char buff[20];
+    struct tm *sTm;
+
+    time_t now = time(0);
+
+    sTm = gmtime(&now);
+
+    strftime(buff, sizeof(buff), "%Y-%m-%dT%H:%M:%S", sTm);
+
+    Json my_json = Json::object {
+        { "msg", msg },
+        { "severity", severity },
+        { "time", buff }
+    };
+    string json_obj_str = my_json.dump();
+    cout << json_obj_str << "\n";
+}
+
+int main(int argc, char **argv) {
+    struct sigaction sa;
+    sigset_t newset;
+
+    sigemptyset(&newset);
+    sigaddset(&newset, SIGHUP);
+    sigprocmask(SIG_BLOCK, &newset, 0);
+    sa.sa_handler = termHandler;
+    sigaction(SIGTERM, &sa, 0);
+
+    unsigned int nthreads = thread::hardware_concurrency();
+    stringstream ss;
+    ss << nthreads;
+    printLog("INFO", "Hardware concurrency (CPU)... " + ss.str());
+
+    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    struct sockaddr_in server;
+
+    if (argc >= 3) {
+        char *host = argv[1];
+        int port = atoi(argv[2]);
+
+        // UDP Server
+        server.sin_family = AF_INET;
+        server.sin_port = htons(port);
+        server.sin_addr.s_addr = inet_addr(host);
+
+        printLog("INFO", "Binding server to socket... OK");
+
+        if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0) {
+            perror(NULL);
+            close(sockfd);
+            exit(0);
+        }
+
+        vector<thread> threads(nthreads);
+
+        for (int i = 0; i < nthreads; i++) {
+            stringstream ss;
+            ss << i;
+            printLog("INFO", "Start thread...  " + ss.str());
+            thread thr(threadProc, i);
+            threads[i] = move(thr);
+        }
+
+        while (StopFlag) {
+            sleep(1);
+        }
+
+        for (auto& thr : threads) {
+            thr.join();
+        }
+
+        exit(EXIT_SUCCESS);
+    } else {
+        cout << "udpserver <host> <port>" << endl;
+    }
+}
+
+void threadProc(int tnum) {
+    struct sockaddr_in client;
+
+    stringstream ss;
+
+    ss << tnum;
+    string tnumStr = ss.str();
+    printLog("INFO", "Server thread " + tnumStr + " started... OK");
+
+    while (StopFlag) {
+        char buffer[1024] = {};
+        socklen_t cs = sizeof(client);
+        printLog("INFO", "Waiting for a UDP datagram (" + tnumStr + ")...");
+        int rc = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&client, &cs);
+        printLog("INFO", "Received (" + tnumStr + ")");
+
+        if (rc < 0) {
+            printLog("ERROR", "ERROR READING FROM SOCKET (" + tnumStr + ")!");
+        } else {
+            for (int i = 0; i < rc; i++) {
+                printf("0x%x;", buffer[i]);
+            }
+
+            cout << endl;
+            unsigned char *conbuf = (unsigned char *)buffer;
+        }
+    }
+}
+
+void termHandler(int i) {
+    printLog("INFO", "Server shutdown...");
+    StopFlag = 0;
+    sleep(10);
+    printLog("INFO", "Server stopped... OK");
+
+    exit(EXIT_SUCCESS);
+}
