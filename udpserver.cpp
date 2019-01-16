@@ -33,10 +33,20 @@ void error(char *msg) {
     exit(EXIT_FAILURE);
 }
 
+void printLog(string msg);
+void printLog(string severity, string msg);
 void termHandler(int i);
 void threadProc(int tnum);
 
+void printLog(string msg) {
+    printLog("INFO", msg);
+}
+
 void printLog(string severity, string msg) {
+    if (severity == "") {
+        severity = "INFO";
+    }
+
     char buff[20];
     struct tm *sTm;
 
@@ -68,7 +78,7 @@ int main(int argc, char **argv) {
     unsigned int nthreads = thread::hardware_concurrency();
     stringstream ss;
     ss << nthreads;
-    printLog("INFO", "Hardware concurrency (CPU)... " + ss.str());
+    printLog("Hardware concurrency (CPU)... " + ss.str());
 
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     struct sockaddr_in server;
