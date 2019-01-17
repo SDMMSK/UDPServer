@@ -12,11 +12,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iterator>
-#include <unistd.h>
 #include <stack>
 #include <vector>
 #include <signal.h>
-
 #include <thread>
 
 #include "json11.hpp"
