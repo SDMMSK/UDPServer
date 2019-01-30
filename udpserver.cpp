@@ -5,15 +5,6 @@
 #include <sstream>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <iterator>
-#include <stack>
-#include <vector>
 #include <signal.h>
 #include <thread>
 
