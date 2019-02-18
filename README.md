@@ -1,7 +1,8 @@
 # Simple multithreaded UDP server
 
-![Languages](https://img.shields.io/github/languages/top/tulir/gomuks.svg)
-[![License](https://img.shields.io/github/license/tulir/gomuks.svg)](LICENSE)  
+![Languages](https://img.shields.io/github/languages/top/SDMMSK/UDPServer.svg?style=flat-square)
+![Code Size](https://img.shields.io/github/languages/code-size/SDMMSK/UDPServer.svg?style=flat-square)
+[![License](https://img.shields.io/github/license/SDMMSK/UDPServer.svg?style=flat-square)](LICENSE)  
 
 Simple multithreaded UDP server.  
 The number of threads is determined by the number of CPU cores.
