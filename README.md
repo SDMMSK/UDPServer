@@ -1,5 +1,8 @@
 # Simple multithreaded UDP server
 
+![Languages](https://img.shields.io/github/languages/top/tulir/gomuks.svg)
+[![License](https://img.shields.io/github/license/tulir/gomuks.svg)](LICENSE)  
+
 Simple multithreaded UDP server.  
 The number of threads is determined by the number of CPU cores.
 
