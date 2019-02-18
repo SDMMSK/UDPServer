@@ -1,7 +1,7 @@
 # Simple multithreaded UDP server
 
-![Languages](https://img.shields.io/github/languages/top/SDMMSK/UDPServer.svg?style=flat-square)
-![Code Size](https://img.shields.io/github/languages/code-size/SDMMSK/UDPServer.svg?style=flat-square)
+[![Languages](https://img.shields.io/github/languages/top/SDMMSK/UDPServer.svg?style=flat-square)](README)
+[![Code Size](https://img.shields.io/github/languages/code-size/SDMMSK/UDPServer.svg?style=flat-square)](README)
 [![License](https://img.shields.io/github/license/SDMMSK/UDPServer.svg?style=flat-square)](LICENSE)  
 
 Simple multithreaded UDP server.  
