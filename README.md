@@ -5,7 +5,8 @@
 [![License](https://img.shields.io/github/license/SDMMSK/UDPServer.svg?style=flat-square)](LICENSE)  
 
 Simple multithreaded UDP server.  
-The number of threads is determined by the number of CPU cores.
+The number of threads is determined by the number of CPU cores.  
+JSON logging.
 
 ## Getting Started
 
