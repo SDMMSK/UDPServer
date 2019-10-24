@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cstring>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <signal.h>
@@ -13,8 +14,11 @@
 using namespace std;
 using namespace json11;
 
-int sockfd;
+unsigned int key[4] = {0xECA5, 0xE52E, 0xEE00, 0xCE5B};
 
+#define BLOCK_SIZE 8
+
+int sockfd;
 int StopFlag = 1;
 
 void error(char *msg) {
@@ -26,6 +30,11 @@ void printLog(string msg);
 void printLog(string severity, string msg);
 void termHandler(int i);
 void threadProc(int tnum);
+
+// XTea Encryption, use if necessary...
+void xteaEncipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]);
+void xteaDecipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]);
+void stringCrypt(char *inout, int len, bool encrypt);
 
 void printLog(string msg) {
     printLog("INFO", msg);
@@ -149,4 +158,53 @@ void termHandler(int i) {
     printLog("INFO", "Server stopped... OK");
 
     exit(EXIT_SUCCESS);
+}
+
+// XTea Encryption, use if necessary...
+void xteaEncipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]) {
+        unsigned int i;
+    uint32_t v0 = v[0], v1 = v[1], sum = 0, delta = 0x9E3779B9;
+    for (i = 0; i < num_rounds; i++) {
+        v0 += (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (sum + key[sum & 3]);
+        sum += delta;
+        v1 += (((v0 << 4) ^ (v0 >> 5)) + v0) ^ (sum + key[(sum >> 11) & 3]);
+    }
+    v[0] = v0; v[1] = v1;
+}
+
+void xteaDecipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]) {
+    unsigned int i;
+    uint32_t v0 = v[0], v1 = v[1], delta = 0x9E3779B9, sum = delta * num_rounds;
+    for (i = 0; i < num_rounds; i++) {
+        v1 -= (((v0 << 4) ^ (v0 >> 5)) + v0) ^ (sum + key[(sum >> 11) & 3]);
+        sum -= delta;
+        v0 -= (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (sum + key[sum & 3]);
+    }
+    v[0] = v0; v[1] = v1;
+}
+
+void stringCrypt(char *inout, int len, bool encrypt) // encrypt true - encrypt, false - decript
+{
+        for (int i = 0; i < len / BLOCK_SIZE; i++) {
+                if (encrypt) {
+                        xteaEncipher(32, (uint32_t*)(inout + (i * BLOCK_SIZE)), key);
+                } else {
+                        xteaDecipher(32, (uint32_t*)(inout + (i * BLOCK_SIZE)), key);
+                }
+    }
+        if (len % BLOCK_SIZE != 0)
+    {
+                int mod = len % BLOCK_SIZE;
+        int offset = (len / BLOCK_SIZE) * BLOCK_SIZE;
+        char data[BLOCK_SIZE];
+        memcpy(data, inout + offset, mod);
+
+        if (encrypt) {
+                        xteaEncipher(32, (uint32_t*)data, key);
+                } else {
+            xteaDecipher(32, (uint32_t*)data, key);
+                }
+                memcpy(inout + offset, data, mod);
+                cout << mod << endl;
+    }
 }
