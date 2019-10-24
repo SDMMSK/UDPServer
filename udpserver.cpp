@@ -162,7 +162,7 @@ void termHandler(int i) {
 
 // XTea Encryption, use if necessary...
 void xteaEncipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4]) {
-        unsigned int i;
+    unsigned int i;
     uint32_t v0 = v[0], v1 = v[1], sum = 0, delta = 0x9E3779B9;
     for (i = 0; i < num_rounds; i++) {
         v0 += (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (sum + key[sum & 3]);
@@ -185,26 +185,24 @@ void xteaDecipher(unsigned int num_rounds, uint32_t v[2], uint32_t const key[4])
 
 void stringCrypt(char *inout, int len, bool encrypt) // encrypt true - encrypt, false - decript
 {
-        for (int i = 0; i < len / BLOCK_SIZE; i++) {
-                if (encrypt) {
-                        xteaEncipher(32, (uint32_t*)(inout + (i * BLOCK_SIZE)), key);
-                } else {
-                        xteaDecipher(32, (uint32_t*)(inout + (i * BLOCK_SIZE)), key);
-                }
+    for (int i = 0; i < len / BLOCK_SIZE; i++) {
+        if (encrypt) {
+            xteaEncipher(32, (uint32_t*)(inout + (i * BLOCK_SIZE)), key);
+        } else {
+            xteaDecipher(32, (uint32_t*)(inout + (i * BLOCK_SIZE)), key);
+        }
     }
-        if (len % BLOCK_SIZE != 0)
-    {
-                int mod = len % BLOCK_SIZE;
+    if (len % BLOCK_SIZE != 0) {
+        int mod = len % BLOCK_SIZE;
         int offset = (len / BLOCK_SIZE) * BLOCK_SIZE;
         char data[BLOCK_SIZE];
         memcpy(data, inout + offset, mod);
 
         if (encrypt) {
-                        xteaEncipher(32, (uint32_t*)data, key);
-                } else {
+            xteaEncipher(32, (uint32_t*)data, key);
+        } else {
             xteaDecipher(32, (uint32_t*)data, key);
-                }
-                memcpy(inout + offset, data, mod);
-                cout << mod << endl;
+        }
+        memcpy(inout + offset, data, mod);
     }
 }
