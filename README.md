@@ -6,7 +6,7 @@
 
 Simple multithreaded UDP server.  
 The number of threads is determined by the number of CPU cores.  
-JSON logging.
+JSON logging.  
 XTea encryption functions.
 
 ## Getting Started
