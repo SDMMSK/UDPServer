@@ -1,4 +1,4 @@
-# Simple multithreaded UDP server
+# Simple C++ multithreaded UDP server
 
 [![Languages](https://img.shields.io/github/languages/top/SDMMSK/UDPServer.svg?style=flat-square)](README.md)
 [![Code Size](https://img.shields.io/github/languages/code-size/SDMMSK/UDPServer.svg?style=flat-square)](README.md)
