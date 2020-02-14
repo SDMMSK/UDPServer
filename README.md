@@ -4,7 +4,7 @@
 [![Code Size](https://img.shields.io/github/languages/code-size/SDMMSK/UDPServer.svg?style=flat-square)](README.md)
 [![License](https://img.shields.io/github/license/SDMMSK/UDPServer.svg?style=flat-square)](LICENSE)  
 
-Simple multithreaded UDP server.  
+Simple C++ multithreaded UDP server.  
 The number of threads is determined by the number of CPU cores.  
 JSON logging.  
 XTea encryption functions.
