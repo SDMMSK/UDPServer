@@ -10,7 +10,7 @@
 #include <signal.h>
 #include <thread>
 
-#include "json11.hpp"
+#include "json11.h"
 
 using namespace std;
 using namespace json11;
